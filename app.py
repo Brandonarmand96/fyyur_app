@@ -82,7 +82,7 @@ def index():
       "venues" : venues_list
       })
 
-  print(data)
+  #print(data)
 
   return render_template('pages/home.html', data=data)
 
@@ -168,19 +168,34 @@ def show_venue(venue_id):
   today = datetime.now()
   if venue:
       phone = (venue.phone[:3] + '-' + venue.phone[3:6] + '-' + venue.phone[6:])
-      upcoming_shows = []
-      past_shows = []
-      for show in venue.shows:
+      #upcoming_shows = []
+      #past_shows = []
+      upcoming_shows = db.session.query(Shows).join(Artist).filter(Shows.venue_id==venue_id).filter(Shows.start_time > today).all()
+      past_shows = db.session.query(Shows).join(Artist).filter(Shows.venue_id==venue_id).filter(Shows.start_time < today).all()
+      #print(past_shows1)
+      #print(upcoming_shows1)
+      for show in past_shows:
           artist = Artist.query.get(show.artist_id)
           show.artist_image_link = artist.image_link
           show.artist_name = artist.name
-          if show.start_time >= today:
-              show.start_time = format_datetime(str(show.start_time))
-              upcoming_shows.append(show)
-              print(upcoming_shows)
-          else:
-              show.start_time = format_datetime(str(show.start_time))
-              past_shows.append(show)
+          show.start_time = format_datetime(str(show.start_time))
+      for show in upcoming_shows:
+          artist = Artist.query.get(show.artist_id)
+          show.artist_image_link = artist.image_link
+          show.artist_name = artist.name
+          show.start_time = format_datetime(str(show.start_time))
+      #for show in venue.shows:
+          #artist = Artist.query.get(show.artist_id)
+          #show.artist_image_link = artist.image_link
+          #show.artist_name = artist.name
+          #if show.start_time >= today:
+              #show.start_time = format_datetime(str(show.start_time))
+              #upcoming_shows.append(show)
+              #print(upcoming_shows)
+          #else:
+              #show.start_time = format_datetime(str(show.start_time))
+              #past_shows.append(show)
+              #print(past_shows)
 
 
       venue.past_shows = past_shows
@@ -315,19 +330,34 @@ def show_artist(artist_id):
   today = datetime.today()
   if artist:
       phone = (artist.phone[:3] + '-' + artist.phone[3:6] + '-' + artist.phone[6:])
-      upcoming_shows = []
-      past_shows = []
+      #upcoming_shows = []
+      #past_shows = []
 
-      for show in artist.shows:
+      #for show in artist.shows:
+          #venue = Venue.query.get(show.venue_id)
+          #show.venue_image_link = venue.image_link
+          #show.venue_name = venue.name
+          #if show.start_time >= today:
+              #show.start_time = format_datetime(str(show.start_time))
+              #upcoming_shows.append(show)
+          #else:
+              #show.start_time = format_datetime(str(show.start_time))
+              #past_shows.append(show)
+      upcoming_shows = db.session.query(Shows).join(Venue).filter(Shows.artist_id==artist_id).filter(Shows.start_time > today).all()
+      past_shows = db.session.query(Shows).join(Venue).filter(Shows.artist_id==artist_id).filter(Shows.start_time < today).all()
+      #print(past_shows1)
+      #print(upcoming_shows1)
+      for show in past_shows:
           venue = Venue.query.get(show.venue_id)
           show.venue_image_link = venue.image_link
           show.venue_name = venue.name
-          if show.start_time >= today:
-              show.start_time = format_datetime(str(show.start_time))
-              upcoming_shows.append(show)
-          else:
-              show.start_time = format_datetime(str(show.start_time))
-              past_shows.append(show)
+          show.start_time = format_datetime(str(show.start_time))
+      for show in upcoming_shows:
+          venue = Venue.query.get(show.venue_id)
+          show.venue_image_link = venue.image_link
+          show.venue_name = venue.name
+          show.start_time = format_datetime(str(show.start_time))
+
       artist.past_shows = past_shows
       artist.upcoming_shows = upcoming_shows
       artist.past_shows_count = len(past_shows)
